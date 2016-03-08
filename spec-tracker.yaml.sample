@@ -1,0 +1,13 @@
+# Name of the release cycle
+cycle: mitaka
+
+# Set of projects to consider in the report
+projects:
+ - nova
+ - glance
+ - swift
+ - keystone
+ - horizon
+ - quantum
+ - cinder
+ - oslo
