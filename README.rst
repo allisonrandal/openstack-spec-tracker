@@ -19,6 +19,8 @@ You'll need the following Python modules installed:
  - launchpadlib
  - jinja2
  - yaml
+ - docutils
+ - textblob
 
 You'll also need a valid SSH key for accessing Gerrit via SSH
 installed in ~/.gerritssh/id_rsa.

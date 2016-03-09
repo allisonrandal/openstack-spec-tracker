@@ -25,10 +25,18 @@ class Specification:
 
     def extract_text_body(self):
         parser = SpecParser(self.specfile)
+        parser.parse()
 
-        self.title = parser.spec_title()
-        self.text = parser.spec_paragraphs()
+        self.title = parser.title
         self.blueprint_url = parser.blueprint
+        self.phrases = parser.phrases
+        print(self.phrases)
+
+    def phrase_frequency(self):
+        frequency = {}
+        for phrase in self.phrases:
+            frequency[phrase] = self.phrases.count(phrase)
+        return frequency
 
 class SpecificationSet:
     def __init__(self, projects, cycle, repocache):

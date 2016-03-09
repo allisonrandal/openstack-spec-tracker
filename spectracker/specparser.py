@@ -15,31 +15,29 @@ import docutils.utils
 from docutils import nodes
 
 import re
+from textblob import TextBlob
 
 class SpecParser:
     def __init__(self, specfile):
+        self.specfile = specfile
+        self.doctree = None
+        self.title = None
+        self.blueprint = None
+        self.phrases = None
+
+    def load_file(self):
+        with open(self.specfile) as spec_fh:
+            self.body = spec_fh.read()
+
+    def parse_file(self):
         parser = docutils.parsers.rst.Parser()
-
-        with open(specfile) as spec_fh:
-            body = spec_fh.read()
-
         settings = docutils.frontend.OptionParser(components=(docutils.parsers.rst.Parser,)).get_default_values()
-        document = docutils.utils.new_document(specfile, settings)
-        parser.parse(body, document)
+        document = docutils.utils.new_document(self.specfile, settings)
+        parser.parse(self.body, document)
 
         self.doctree = document
-        self.blueprint = None
 
-    def spec_title(self):
-        # The first title in the first section is the document title
-        if len(self.doctree):
-            for section in self.doctree:
-                if isinstance(section, nodes.section):
-                    for element in section:
-                        if isinstance(element, nodes.title):
-                            return element.astext()
-
-    def spec_paragraphs(self):
+    def spec_scanner(self):
         # Scan the document tree for paragraphs of text
         url_pattern = re.compile('https://blueprints\.launchpad\.net/[a-z]+/\+spec/[a-z0-9\-]+')
         paragraphs = []
@@ -47,7 +45,10 @@ class SpecParser:
             for section in self.doctree:
                 if isinstance(section, nodes.section):
                     for element in section:
-                        if isinstance(element, nodes.paragraph):
+                        if isinstance(element, nodes.title) and not self.title:
+                            # The first title in the first section is the document title
+                            self.title = element.astext()
+                        elif isinstance(element, nodes.paragraph):
                             text = element.astext()
                             match = url_pattern.search(text)
                             if match:
@@ -60,3 +61,13 @@ class SpecParser:
                                     paragraphs.append(subelement.astext())
 
         return paragraphs
+
+    def parse_text(self):
+        paragraphs = self.spec_scanner()
+        textparser = TextBlob(" ".join(paragraphs))
+        self.phrases = textparser.noun_phrases
+
+    def parse(self):
+        self.load_file()
+        self.parse_file()
+        self.parse_text()
