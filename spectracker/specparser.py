@@ -41,7 +41,7 @@ class SpecParser:
 
     def spec_paragraphs(self):
         # Scan the document tree for paragraphs of text
-        url_pattern = re.compile('https://blueprints\.launchpad\.net/[a-z]+/\+spec/[a-z\-]+')
+        url_pattern = re.compile('https://blueprints\.launchpad\.net/[a-z]+/\+spec/[a-z0-9\-]+')
         paragraphs = []
         if len(self.doctree):
             for section in self.doctree:
@@ -49,7 +49,7 @@ class SpecParser:
                     for element in section:
                         if isinstance(element, nodes.paragraph):
                             text = element.astext()
-                            match = url_pattern.match(text)
+                            match = url_pattern.search(text)
                             if match:
                                 self.blueprint = match.group()
                             else:
