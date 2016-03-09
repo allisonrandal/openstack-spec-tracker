@@ -14,12 +14,21 @@ import glob
 import os.path
 from os import listdir
 
+from spectracker.specparser import SpecParser
+
 class Specification:
     def __init__(self, name, specfile, project, cycle):
         self.name = name
         self.specfile = specfile
         self.project = project
         self.cycle = cycle
+
+    def extract_text_body(self):
+        parser = SpecParser(self.specfile)
+
+        self.title = parser.spec_title()
+        self.text = parser.spec_paragraphs()
+        self.blueprint_url = parser.blueprint
 
 class SpecificationSet:
     def __init__(self, projects, cycle, repocache):
@@ -40,3 +49,7 @@ class SpecificationSet:
     def add_spec(self, specname, specfile, project):
         spec = Specification(specname, specfile, project, self.cycle)
         self.specs.append(spec)
+
+    def parse_specs(self):
+        for spec in self.specs:
+            spec.extract_text_body()

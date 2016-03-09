@@ -13,7 +13,7 @@
 import argparse
 import yaml
 
-from spectracker import specification
+from spectracker.specification import SpecificationSet
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -37,5 +37,6 @@ if __name__ == '__main__':
     with open(args.config) as config_fh:
         config = yaml.load(config_fh)
 
-    spec_set = specification.SpecificationSet(config['projects'], config['cycle'], args.repocache)
+    spec_set = SpecificationSet(config['projects'], config['cycle'], args.repocache)
     spec_set.load_specs()
+    spec_set.parse_specs()
