@@ -47,12 +47,14 @@ class SpecificationSet:
 
     def load_specs(self):
         for project in self.projects:
-            specdir = os.path.join(self.repocache, project+"-specs", "specs", self.cycle, "approved")
-            for filename in listdir(specdir):
-                specfile = os.path.join(specdir, filename)
-                if os.path.isfile(specfile) and not os.path.islink(specfile):
-                    (specname, extension) = os.path.splitext(filename)
-                    self.add_spec(specname, specfile, project)
+            specdir = os.path.join(self.repocache, project+"-specs", "specs", self.cycle)
+            for root, directory, files in os.walk(specdir):
+                for filename in files:
+                    specfile = os.path.join(root, filename)
+                    if os.path.isfile(specfile) and not os.path.islink(specfile):
+                        (specname, extension) = os.path.splitext(filename)
+                        if extension == '.rst' and not specname in ['index', 'template']:
+                            self.add_spec(specname, specfile, project)
 
     def add_spec(self, specname, specfile, project):
         spec = Specification(specname, specfile, project, self.cycle)
