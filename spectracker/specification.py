@@ -13,6 +13,7 @@
 import glob
 import os.path
 from os import listdir
+import re
 
 from spectracker.specparser import SpecParser
 
@@ -30,7 +31,6 @@ class Specification:
         self.title = parser.title
         self.blueprint_url = parser.blueprint
         self.phrases = parser.phrases
-        print(self.phrases)
 
     def phrase_frequency(self):
         frequency = {}
@@ -61,3 +61,25 @@ class SpecificationSet:
     def parse_specs(self):
         for spec in self.specs:
             spec.extract_text_body()
+
+    def aggregate_topic_frequency(self):
+        frequency = {}
+        skipwords = ['nova', 'neutron', 'glance', 'keystone', 'vm', 'ironic', 'openstack']
+        first_char_pattern = re.compile('[a-z0-9]')
+        for spec in self.specs:
+            for phrase in spec.phrases:
+                match = first_char_pattern.match(phrase)
+                if not match:
+                    continue
+
+                if phrase in skipwords:
+                    continue
+
+                if phrase in frequency:
+                    frequency[phrase] += spec.phrases.count(phrase)
+                else:
+                    frequency[phrase] = spec.phrases.count(phrase)
+
+        highfrequency = {k: v for k, v in frequency.items() if v > 10}
+
+        return highfrequency

@@ -12,8 +12,12 @@
 
 import argparse
 import yaml
+from datetime import date, datetime
 
 from spectracker.specification import SpecificationSet
+
+from jinja2 import Environment, FileSystemLoader
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -21,6 +25,11 @@ if __name__ == '__main__':
         '--config',
         default='spectracker.yaml',
         help='Configuration file (default: spectracker.yaml)',
+    )
+    parser.add_argument(
+        '-t', '--templates',
+        default='templates',
+        help='Template directory (default: templates/)',
     )
     parser.add_argument(
         '-o', '--output',
@@ -40,3 +49,13 @@ if __name__ == '__main__':
     spec_set = SpecificationSet(config['projects'], config['cycle'], args.repocache)
     spec_set.load_specs()
     spec_set.parse_specs()
+
+    phrase_freq = spec_set.aggregate_topic_frequency()
+
+    template_env = Environment(loader=FileSystemLoader(args.templates))
+    keytopics_tmpl = template_env.get_template('keytopics.html')
+
+    print (keytopics_tmpl.render(series=config['cycle'],
+                          date=str(datetime.utcnow()),
+                          frequency=phrase_freq)
+          )
