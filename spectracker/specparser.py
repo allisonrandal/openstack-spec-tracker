@@ -11,6 +11,7 @@
 #    under the License.
 
 import docutils.parsers.rst
+from docutils.parsers.rst import Directive
 import docutils.utils
 from docutils import nodes
 
@@ -30,6 +31,7 @@ class SpecParser:
             self.body = spec_fh.read()
 
     def parse_file(self):
+        docutils.parsers.rst.directives.register_directive("literalinclude", MockLiteralInclude)
         parser = docutils.parsers.rst.Parser()
         settings = docutils.frontend.OptionParser(components=(docutils.parsers.rst.Parser,)).get_default_values()
         document = docutils.utils.new_document(self.specfile, settings)
@@ -71,3 +73,19 @@ class SpecParser:
         self.load_file()
         self.parse_file()
         self.parse_text()
+
+
+# Sphinx has a 'literalinclude' directive that docutils doesn't have. We don't
+# need it, so just mock it. Parsing succeeds, while ignoring the directive.
+
+class MockLiteralInclude(Directive):
+    required_arguments = 1
+    optional_arguments = 0
+    final_argument_whitespace = True
+    option_spec = {}
+    has_content = False
+
+    def run(self):
+        include_file = docutils.parsers.rst.directives.uri(self.arguments[0])
+        include_node = nodes.literal_block(rawsource=include_file)
+        return [include_node]
