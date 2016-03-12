@@ -1,23 +1,23 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html dir="ltr" lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      lang="en">
  <head>
   <meta content="text/html; charset=utf8" http-equiv="Content-Type"/>
-  <base href="."/>
   <title>
    {{ series|capitalize }} release status
   </title>
-  <link href="https://blueprints.launchpad.net/@@/launchpad.png" rel="shortcut icon"/>
-  <script src="http://status.openstack.org/common.js" type="text/javascript">
-  </script>
-  <link href="http://fonts.googleapis.com/css?family=PT+Sans&amp;subset=latin" rel="stylesheet" type="text/css"/>
-  <link href="http://www.openstack.org/themes/openstack/css/blueprint/screen.css" media="screen, projection" rel="stylesheet" type="text/css"/>
-  <link href="http://www.openstack.org/themes/openstack/css/blueprint/print.css" media="print" rel="stylesheet" type="text/css"/>
-  <link href="http://www.openstack.org/themes/openstack/css/main.css" rel="stylesheet" type="text/css"/>
-  <link href="combo.css" media="screen,print" rel="stylesheet" type="text/css"/>
-  <script src="sorting.js" type="text/javascript">
-  </script>
-  <script src="https://www.google.com/jsapi" type="text/javascript">
-  </script>
+  <script type="text/javascript"
+          src="http://status.openstack.org/common.js"></script>
+
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=PT+Sans&amp;subset=latin"/>
+
+  <!-- Framework CSS -->
+  <link rel="stylesheet" type="text/css" href="http://www.openstack.org/themes/openstack/css/blueprint/screen.css" media="screen, projection"/>
+  <link rel="stylesheet" type="text/css" href="http://www.openstack.org/themes/openstack/css/blueprint/print.css" media="print"/>
+  <link rel="stylesheet" type="text/css" href="http://www.openstack.org/themes/openstack/css/main.css"/>
+
  </head>
  <body id="document">
   <script type="text/javascript">
@@ -43,20 +43,14 @@
    <h2>
     Topic Frequency
    </h2>
-   <table class="listing sortable" id="speclisting">
+   <table>
     <thead>
      <tr>
       <th>
-       <a class="sortheader" href="#" id="sorttopic" onclick="ts_resortTable(this); return false;">
-        Topic
-        <img class="sortarrow" height="6" src="arrowBlank" width="9"/>
-       </a>
+       Topic
       </th>
       <th>
-       <a class="sortheader" href="#" id="sortfreq" onclick="ts_resortTable(this); return false;">
-        Frequency
-        <img class="sortarrow" height="6" src="arrowDown" width="9"/>
-       </a>
+       Frequency
       </th>
      </tr>
     </thead>
@@ -64,15 +58,9 @@
 {% macro render_frequency(topic) -%}
      <tr>
       <td>
-       <span class="sortkey">
-        {{ topic }}
-       </span>
        {{ topic }}
       </td>
       <td>
-       <span class="sortkey">
-        {{ frequency[topic] }}
-       </span>
        {{ frequency[topic] }}
       </td>
      </tr>
@@ -80,10 +68,6 @@
      {% for topic in frequency %}{{ render_frequency(topic) }}{% endfor %}
     </tbody>
    </table>
-   <script type="text/javascript">
-    // Sort by default by frequency
-    ts_resortTable(document.getElementById("sortfreq"))
-   </script>
   </div>
   <script type="text/javascript">
    footer();
