@@ -18,6 +18,11 @@
   <link rel="stylesheet" type="text/css" href="http://www.openstack.org/themes/openstack/css/blueprint/print.css" media="print"/>
   <link rel="stylesheet" type="text/css" href="http://www.openstack.org/themes/openstack/css/main.css"/>
 
+  <!-- Page Specific CSS -->
+  <link rel="stylesheet" type="text/css" href="http://status.openstack.org/reviews/combo.css" media="screen,print"/>
+  <script type="text/javascript"
+          src="http://status.openstack.org/reviews/sorting.js"></script>
+
  </head>
  <body id="document">
   <script type="text/javascript">
@@ -43,14 +48,20 @@
    <h2>
     Topic Frequency
    </h2>
-   <table>
+   <table class="listing sortable" summary="key topic frequency">
     <thead>
      <tr>
       <th>
-       Topic
+       <a class="sortheader" href="#" id="key-topic-name" onclick="ts_resortTable(this); return false;" title="Topic">
+        Topic
+        <img class="sortarrow" height="6" src="arrowBlank" width="9"/>
+       </a>
       </th>
       <th>
-       Frequency
+       <a class="sortheader" href="#" id="key-topic-frequency" onclick="ts_resortTable(this); return false;" title="Frequency">
+        Frequency
+        <img class="sortarrow" height="6" src="arrowBlank" width="9"/>
+       </a>
       </th>
      </tr>
     </thead>
@@ -58,9 +69,15 @@
 {% macro render_frequency(topic) -%}
      <tr>
       <td>
+       <span class="sortkey">
+        {{ topic }}
+       </span>
        {{ topic }}
       </td>
       <td>
+       <span class="sortkey">
+        {{ -frequency[topic] }}
+       </span>
        {{ frequency[topic] }}
       </td>
      </tr>
@@ -68,6 +85,9 @@
      {% for topic in frequency %}{{ render_frequency(topic) }}{% endfor %}
     </tbody>
    </table>
+   <script type="text/javascript">
+    ts_resortTable(document.getElementById("key-topic-frequency"))
+   </script>
   </div>
   <script type="text/javascript">
    footer();
