@@ -66,7 +66,7 @@ class SpecificationSet:
 
     def aggregate_topic_frequency(self):
         frequency = {}
-        skipwords = ['nova', 'neutron', 'glance', 'keystone', 'vm', 'ironic', 'openstack']
+        skipwords = ['barbican', 'castellan', 'ceilometer', 'cinder', 'glance', 'ironic', 'keystone', 'lbaas', 'neutron','nova',  'openstack', 'swift', 'grizzly', 'havana', 'icehouse', 'juno', 'liberty', 'mitaka']
         first_char_pattern = re.compile('[a-z0-9]')
         for spec in self.specs:
             for phrase in spec.phrases:
