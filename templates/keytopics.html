@@ -20,8 +20,11 @@
 
   <!-- Page Specific CSS -->
   <link rel="stylesheet" type="text/css" href="http://status.openstack.org/reviews/combo.css" media="screen,print"/>
+
   <script type="text/javascript"
           src="http://status.openstack.org/reviews/sorting.js"></script>
+  <script type="text/javascript"
+          src="http://timdream.org/wordcloud2.js/src/wordcloud2.js"></script>
 
  </head>
  <body id="document">
@@ -39,9 +42,22 @@
      </li>
     </ul>
    </div>
-   <div class="span-4 last">
-    <div id="chart_div">
-    </div>
+  </div>
+  <div class="container">
+   <div style="padding: 10px; position: relative; margin-bottom: 6px;">
+    <canvas id="wordcanvas" class="canvas"
+            style="left: 0px; top: 0px;"
+            width=900 height="400">
+    </canvas>
+    <script type="text/javascript">
+      wordlist = [
+{% macro render_wordcloud_data(topic) -%}
+                   ["{{ topic }}", {{ frequency[topic] }}],
+{%- endmacro %}
+     {% for topic in frequency %}{{ render_wordcloud_data(topic) }}{% endfor %}
+       ];
+      WordCloud(document.getElementById('wordcanvas'), { list: wordlist, color: 'random-dark', ellipticity: 10, rotateRatio: 0.7, weightFactor: 0.3, minSize: 8, gridSize: 8 } );
+    </script>
    </div>
   </div>
   <div class="container">
