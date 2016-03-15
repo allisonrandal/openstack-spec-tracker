@@ -40,7 +40,7 @@ class Contributors:
                 self.release_index[name] = { 'end': end_date, 'start': start_date }
             previous_end = end_date
 
-    def contributor_companies(self, userid, cycle):
+    def affiliation(self, users, cycle):
         if not self.user_index:
             self.build_user_index()
 
@@ -48,16 +48,17 @@ class Contributors:
             self.build_release_index()
 
         cycle_start = self.release_index[cycle]['start']
-        companies = []
-        if userid in self.user_index:
-            user = self.user_index[userid]
-            if 'companies' in user:
-                for company in user['companies']:
-                    if company['end_date']:
-                        final = datetime.strptime(company['end_date'], "%Y-%b-%d")
-                        if final > cycle_start:
-                            companies.append(company['company_name'])
-                    else:
-                        companies.append(company['company_name'])
+        for userid in users:
+            companies = set()
+            if userid in self.user_index:
+                user = self.user_index[userid]
+                if 'companies' in user:
+                    for company in user['companies']:
+                        if company['end_date']:
+                            final = datetime.strptime(company['end_date'], "%Y-%b-%d")
+                            if final > cycle_start:
+                                companies.add(company['company_name'])
+                        else:
+                            companies.add(company['company_name'])
 
-        return companies
+        return list(companies)

@@ -16,6 +16,8 @@ from os import listdir
 import re
 
 from spectracker.specparser import SpecParser
+from spectracker.blueprint import BlueprintSet
+from spectracker.contributors import Contributors
 
 class Specification:
     def __init__(self, name, specfile, project, cycle):
@@ -23,6 +25,10 @@ class Specification:
         self.specfile = specfile
         self.project = project
         self.cycle = cycle
+        self.blueprint_url = None
+        self.blueprint = None
+        self.phrases = None
+        self.companies = None
 
     def extract_text_body(self):
         parser = SpecParser(self.specfile)
@@ -38,12 +44,31 @@ class Specification:
             frequency[phrase] = self.phrases.count(phrase)
         return frequency
 
+    def load_blueprint(self, launchpad):
+        if self.blueprint_url:
+            self.blueprint = launchpad.load_blueprint_url(self.blueprint_url)
+        else:
+            self.blueprint = launchpad.load_blueprint(self.project,self.name)
+
+    def contributor_affiliation(self, launchpad, contributors):
+        if not self.blueprint:
+            self.load_blueprint(launchpad)
+
+        if not self.blueprint:
+            return []
+
+        self.companies = contributors.affiliation(self.blueprint.contributors, self.cycle)
+
+        return self.companies
+
 class SpecificationSet:
     def __init__(self, projects, cycle, repocache):
         self.projects = projects
         self.cycle = cycle
         self.repocache = os.path.abspath(repocache)
         self.specs = []
+        self.contributor_index = None
+        self.launchpad = None
 
     def load_specs(self):
         for project in self.projects:
@@ -85,3 +110,19 @@ class SpecificationSet:
         highfrequency = {k: v for k, v in frequency.items() if v > 10}
 
         return highfrequency
+
+    def filter_by_company(self, company):
+        if not self.contributor_index:
+            self.contributor_index = Contributors(self.repocache)
+
+        if not self.launchpad:
+            self.launchpad = BlueprintSet(self.repocache)
+
+        filtered_specs = []
+        for spec in self.specs:
+            affiliation = spec.contributor_affiliation(self.launchpad, self.contributor_index)
+            print(spec.name, affiliation)
+            if company in affiliation:
+                filtered_specs.append(spec)
+
+        return filtered_specs
