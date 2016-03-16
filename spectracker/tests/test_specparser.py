@@ -58,7 +58,18 @@ propose to solve this problem?
 
 If this is one part of a larger effort make it clear where this piece ends. In
 other words, what's the scope of this effort?
+"""
 
+_SPEC_FILE_LITERAL_INCLUDE = """
+Literal Include Example
+=======================
+
+Some spec files contain literal include directives, which are unique
+to sphinx. Make sure they parse cleanly.
+
+.. literalinclude:: example-include-file.json
+    :linenos:
+    :language: json
 """
 
 
@@ -86,6 +97,16 @@ class TestSpecParser(base.TestCase):
                          'https://blueprints.launchpad.net/nova/+spec/example')
 
         self.assertEqual(parser.phrases.count('launchpad blueprint'), 1)
+
+    def test_literalinclude(self):
+        parser = SpecParser('fake-file')
+
+        parser.body = _SPEC_FILE_LITERAL_INCLUDE
+        parser.parse_file()
+        parser.spec_scanner()
+
+        self.assertEqual(parser.title,
+                         'Literal Include Example')
 
     def setUp(self):
         super(TestSpecParser, self).setUp()
