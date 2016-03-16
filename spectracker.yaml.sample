@@ -11,3 +11,29 @@ projects:
  - quantum
  - cinder
  - oslo
+
+# Set of common words and phrases that shouldn't be
+# counted as topics in frequency calculations
+skiptopics:
+ - barbican
+ - castellan
+ - ceilometer
+ - cinder
+ - glance
+ - ironic
+ - keystone
+ - lbaas
+ - neutron
+ - nova
+ - openstack
+ - swift
+ - grizzly
+ - havana
+ - icehouse
+ - juno
+ - liberty
+ - mitaka
+ - newton
+ - api
+ - vif
+ - vm

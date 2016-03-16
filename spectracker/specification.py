@@ -91,27 +91,8 @@ class SpecificationSet(object):
         for spec in self.specs:
             spec.extract_text_body()
 
-    def aggregate_topic_frequency(self):
+    def aggregate_topic_frequency(self, skiptopics=None):
         frequency = {}
-        skipwords = [
-            'barbican',
-            'castellan',
-            'ceilometer',
-            'cinder',
-            'glance',
-            'ironic',
-            'keystone',
-            'lbaas',
-            'neutron',
-            'nova',
-            'openstack',
-            'swift',
-            'grizzly',
-            'havana',
-            'icehouse',
-            'juno',
-            'liberty',
-            'mitaka']
 
         first_char_pattern = re.compile('[a-z0-9]')
         for spec in self.specs:
@@ -120,7 +101,7 @@ class SpecificationSet(object):
                 if not match:
                     continue
 
-                if phrase in skipwords:
+                if skiptopics and phrase in skiptopics:
                     continue
 
                 if phrase in frequency:

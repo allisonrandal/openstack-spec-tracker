@@ -52,7 +52,7 @@ if __name__ == '__main__':
     spec_set.load_specs()
     spec_set.parse_specs()
 
-    phrase_freq = spec_set.aggregate_topic_frequency()
+    phrase_freq = spec_set.aggregate_topic_frequency(config['skiptopics'])
 
     template_env = Environment(loader=FileSystemLoader(args.templates))
     keytopics_tmpl = template_env.get_template('keytopics.html')
