@@ -10,13 +10,16 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from datetime import datetime
+from datetime import timedelta
 import json
 import os.path
-from datetime import datetime, timedelta
 
-class Contributors:
+
+class Contributors(object):
     def __init__(self, repocache):
-        datafile = os.path.join(repocache, "stackalytics", "etc", "default_data.json")
+        datafile = os.path.join(repocache, "stackalytics",
+                                "etc", "default_data.json")
         with open(datafile) as data_fh:
             self.data = json.load(data_fh)
         self.user_index = None
@@ -37,7 +40,8 @@ class Contributors:
             end_date = datetime.strptime(release['end_date'], "%Y-%b-%d")
             if name != 'prehistory':
                 start_date = previous_end + timedelta(days=1)
-                self.release_index[name] = { 'end': end_date, 'start': start_date }
+                self.release_index[name] = {'end': end_date,
+                                            'start': start_date}
             previous_end = end_date
 
     def affiliation(self, users, cycle):
@@ -55,7 +59,8 @@ class Contributors:
                 if 'companies' in user:
                     for company in user['companies']:
                         if company['end_date']:
-                            final = datetime.strptime(company['end_date'], "%Y-%b-%d")
+                            final = datetime.strptime(company['end_date'],
+                                                      "%Y-%b-%d")
                             if final > cycle_start:
                                 companies.add(company['company_name'])
                         else:

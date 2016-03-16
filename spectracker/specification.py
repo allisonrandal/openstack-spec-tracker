@@ -10,16 +10,15 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import glob
 import os.path
-from os import listdir
 import re
 
-from spectracker.specparser import SpecParser
 from spectracker.blueprint import BlueprintSet
 from spectracker.contributors import Contributors
+from spectracker.specparser import SpecParser
 
-class Specification:
+
+class Specification(object):
     def __init__(self, name, specfile, project, cycle):
         self.name = name
         self.specfile = specfile
@@ -48,20 +47,22 @@ class Specification:
         if self.blueprint_url:
             self.blueprint = launchpad.load_blueprint_url(self.blueprint_url)
         else:
-            self.blueprint = launchpad.load_blueprint(self.project,self.name)
+            self.blueprint = launchpad.load_blueprint(self.project, self.name)
 
-    def contributor_affiliation(self, launchpad, contributors):
+    def affiliation(self, launchpad, contributors):
         if not self.blueprint:
             self.load_blueprint(launchpad)
 
         if not self.blueprint:
             return []
 
-        self.companies = contributors.affiliation(self.blueprint.contributors, self.cycle)
+        self.companies = contributors.affiliation(self.blueprint.contributors,
+                                                  self.cycle)
 
         return self.companies
 
-class SpecificationSet:
+
+class SpecificationSet(object):
     def __init__(self, projects, cycle, repocache):
         self.projects = projects
         self.cycle = cycle
@@ -72,18 +73,19 @@ class SpecificationSet:
 
     def load_specs(self):
         for project in self.projects:
-            specdir = os.path.join(self.repocache, project+"-specs", "specs", self.cycle)
+            specdir = os.path.join(self.repocache, project + "-specs",
+                                   "specs", self.cycle)
             for root, directory, files in os.walk(specdir):
                 for filename in files:
                     specfile = os.path.join(root, filename)
-                    if os.path.isfile(specfile) and not os.path.islink(specfile):
-                        (specname, extension) = os.path.splitext(filename)
-                        if extension == '.rst' and not specname in ['index', 'template']:
-                            self.add_spec(specname, specfile, project)
+                    self.add_spec(filename, specfile, project)
 
-    def add_spec(self, specname, specfile, project):
-        spec = Specification(specname, specfile, project, self.cycle)
-        self.specs.append(spec)
+    def add_spec(self, filename, specfile, project):
+        if os.path.isfile(specfile) and not os.path.islink(specfile):
+            (specname, extension) = os.path.splitext(filename)
+            if extension == '.rst' and specname not in ['index', 'template']:
+                spec = Specification(specname, specfile, project, self.cycle)
+                self.specs.append(spec)
 
     def parse_specs(self):
         for spec in self.specs:
@@ -91,7 +93,26 @@ class SpecificationSet:
 
     def aggregate_topic_frequency(self):
         frequency = {}
-        skipwords = ['barbican', 'castellan', 'ceilometer', 'cinder', 'glance', 'ironic', 'keystone', 'lbaas', 'neutron','nova',  'openstack', 'swift', 'grizzly', 'havana', 'icehouse', 'juno', 'liberty', 'mitaka']
+        skipwords = [
+            'barbican',
+            'castellan',
+            'ceilometer',
+            'cinder',
+            'glance',
+            'ironic',
+            'keystone',
+            'lbaas',
+            'neutron',
+            'nova',
+            'openstack',
+            'swift',
+            'grizzly',
+            'havana',
+            'icehouse',
+            'juno',
+            'liberty',
+            'mitaka']
+
         first_char_pattern = re.compile('[a-z0-9]')
         for spec in self.specs:
             for phrase in spec.phrases:
@@ -120,7 +141,8 @@ class SpecificationSet:
 
         filtered_specs = []
         for spec in self.specs:
-            affiliation = spec.contributor_affiliation(self.launchpad, self.contributor_index)
+            affiliation = spec.affiliation(self.launchpad,
+                                           self.contributor_index)
             print(spec.name, affiliation)
             if company in affiliation:
                 filtered_specs.append(spec)

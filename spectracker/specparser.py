@@ -10,15 +10,16 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from docutils import nodes
 import docutils.parsers.rst
 from docutils.parsers.rst import Directive
 import docutils.utils
-from docutils import nodes
 
 import re
 from textblob import TextBlob
 
-class SpecParser:
+
+class SpecParser(object):
     def __init__(self, specfile):
         self.specfile = specfile
         self.doctree = None
@@ -31,9 +32,13 @@ class SpecParser:
             self.body = spec_fh.read()
 
     def parse_file(self):
-        docutils.parsers.rst.directives.register_directive("literalinclude", MockLiteralInclude)
+        docutils.parsers.rst.directives.register_directive("literalinclude",
+                                                           MockLiteralInclude)
         parser = docutils.parsers.rst.Parser()
-        settings = docutils.frontend.OptionParser(components=(docutils.parsers.rst.Parser,)).get_default_values()
+
+        settings = docutils.frontend.OptionParser(
+            components=(docutils.parsers.rst.Parser,)).get_default_values()
+
         document = docutils.utils.new_document(self.specfile, settings)
         parser.parse(self.body, document)
 
@@ -41,14 +46,16 @@ class SpecParser:
 
     def spec_scanner(self):
         # Scan the document tree for paragraphs of text
-        url_pattern = re.compile('https://blueprints\.launchpad\.net/[a-z]+/\+spec/[a-z0-9\-]+')
+        url_pattern = re.compile(
+            'https://blueprints\.launchpad\.net/[a-z]+/\+spec/[a-z0-9\-]+')
         paragraphs = []
         if len(self.doctree):
             for section in self.doctree:
                 if isinstance(section, nodes.section):
                     for element in section:
                         if isinstance(element, nodes.title) and not self.title:
-                            # The first title in the first section is the document title
+                            # The first title in the first section is the
+                            # document title
                             self.title = element.astext()
                         elif isinstance(element, nodes.paragraph):
                             text = element.astext()

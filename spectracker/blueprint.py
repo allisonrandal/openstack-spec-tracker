@@ -14,7 +14,8 @@
 
 from launchpadlib.launchpad import Launchpad
 
-class Blueprint:
+
+class Blueprint(object):
     priorities = ('Essential', 'High', 'Medium', 'Low', 'Undefined', 'Not')
 
     implementations = ('Implemented', 'Deployment', 'Needs Code Review',
@@ -37,7 +38,7 @@ class Blueprint:
             self.milestonedate = '2099-12-31'
             self.milestonelink = ''
         self.implementationindex = self.implementations.index(
-                                       self.implementation)
+            self.implementation)
         self.priorityindex = self.priorities.index(self.priority)
         self.reviews = []
 
@@ -57,10 +58,13 @@ class Blueprint:
             self.drafter = ''
 
 
-class BlueprintSet:
+class BlueprintSet(object):
     def __init__(self, repocache):
-        self.launchpad = Launchpad.login_anonymously('spec-tracker', 'production',
-                         repocache+'/launchpadlib-cache', version='devel')
+        self.launchpad = Launchpad.login_anonymously(
+            'spec-tracker',
+            'production',
+            repocache + '/launchpadlib-cache',
+            version='devel')
 
     def load_blueprint_url(self, url):
         bppath = url.split('/')
@@ -69,8 +73,8 @@ class BlueprintSet:
         return self.load_blueprint(project, bpname)
 
     def load_blueprint(self, project, bpname):
-         lbp = self.launchpad.projects[project].getSpecification(name=bpname)
-         if not lbp:
-             return None
-         blueprint = Blueprint(lbp)
-         return blueprint
+        lbp = self.launchpad.projects[project].getSpecification(name=bpname)
+        if not lbp:
+            return None
+        blueprint = Blueprint(lbp)
+        return blueprint
