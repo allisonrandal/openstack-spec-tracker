@@ -91,6 +91,14 @@ which are unique to sphinx. Make sure they parse cleanly.
   }
 """
 
+_SPEC_FILE_REF_ROLE = """
+Ref Role Example
+================
+
+Some spec files contain 'ref' roles, which are unique to sphinx. Make
+sure they parse cleanly. See also :ref:`some-other-doc`.
+"""
+
 
 class TestSpecParser(base.TestCase):
 
@@ -136,6 +144,16 @@ class TestSpecParser(base.TestCase):
 
         self.assertEqual(parser.title,
                          'Network Diagram Example')
+
+    def test_ref_role(self):
+        parser = SpecParser('fake-file')
+
+        parser.body = _SPEC_FILE_REF_ROLE
+        parser.parse_file()
+        parser.spec_scanner()
+
+        self.assertEqual(parser.title,
+                         'Ref Role Example')
 
     def setUp(self):
         super(TestSpecParser, self).setUp()

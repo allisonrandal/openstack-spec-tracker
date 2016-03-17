@@ -13,6 +13,7 @@
 from docutils import nodes
 import docutils.parsers.rst
 from docutils.parsers.rst import Directive
+from docutils.parsers.rst import roles
 import docutils.utils
 
 import re
@@ -32,6 +33,7 @@ class SpecParser(object):
             self.body = spec_fh.read()
 
     def parse_file(self):
+        roles.register_generic_role('ref', nodes.emphasis)
         docutils.parsers.rst.directives.register_directive("literalinclude",
                                                            MockLiteralInclude)
         docutils.parsers.rst.directives.register_directive("nwdiag",
