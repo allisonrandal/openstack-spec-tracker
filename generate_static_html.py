@@ -11,12 +11,10 @@
 #    under the License.
 
 import argparse
-from datetime import datetime
-from jinja2 import Environment
-from jinja2 import FileSystemLoader
 import yaml
 
 from spectracker.specification import SpecificationSet
+from spectracker.pagerender import render_keytopics
 
 
 if __name__ == '__main__':
@@ -46,17 +44,12 @@ if __name__ == '__main__':
     with open(args.config) as config_fh:
         config = yaml.load(config_fh)
 
-    spec_set = SpecificationSet(config['projects'],
+    specs = SpecificationSet(config['projects'],
                                 config['cycle'],
                                 args.repocache)
-    spec_set.load_specs()
-    spec_set.parse_specs()
+    specs.load_specs()
+    specs.parse_specs()
 
-    phrase_freq = spec_set.aggregate_topic_frequency(config['skiptopics'])
+    topics = specs.aggregate_topic_frequency(config['skiptopics'])
 
-    template_env = Environment(loader=FileSystemLoader(args.templates))
-    keytopics_tmpl = template_env.get_template('keytopics.html')
-
-    print(keytopics_tmpl.render(series=config['cycle'],
-                                date=str(datetime.utcnow()),
-                                frequency=phrase_freq))
+    render_keytopics(args.templates, topics, config['cycle'])
