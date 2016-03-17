@@ -72,6 +72,25 @@ to sphinx. Make sure they parse cleanly.
     :language: json
 """
 
+_SPEC_FILE_NETWORK_DIAG = """
+Network Diagram Example
+=======================
+
+Some spec files contain network diagram literal block directives,
+which are unique to sphinx. Make sure they parse cleanly.
+
+.. nwdiag::
+
+  nwdiag {
+
+    network external {
+      gateway_router[color = red];
+      tenant_router1;
+      tenant_router2;
+    }
+  }
+"""
+
 
 class TestSpecParser(base.TestCase):
 
@@ -107,6 +126,16 @@ class TestSpecParser(base.TestCase):
 
         self.assertEqual(parser.title,
                          'Literal Include Example')
+
+    def test_nwdiag(self):
+        parser = SpecParser('fake-file')
+
+        parser.body = _SPEC_FILE_NETWORK_DIAG
+        parser.parse_file()
+        parser.spec_scanner()
+
+        self.assertEqual(parser.title,
+                         'Network Diagram Example')
 
     def setUp(self):
         super(TestSpecParser, self).setUp()

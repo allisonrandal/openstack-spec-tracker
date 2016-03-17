@@ -34,6 +34,8 @@ class SpecParser(object):
     def parse_file(self):
         docutils.parsers.rst.directives.register_directive("literalinclude",
                                                            MockLiteralInclude)
+        docutils.parsers.rst.directives.register_directive("nwdiag",
+                                                           MockBlockDiag)
         parser = docutils.parsers.rst.Parser()
 
         settings = docutils.frontend.OptionParser(
@@ -82,8 +84,9 @@ class SpecParser(object):
         self.parse_text()
 
 
-# Sphinx has a 'literalinclude' directive that docutils doesn't have. We don't
-# need it, so just mock it. Parsing succeeds, while ignoring the directive.
+# Sphinx has a 'literalinclude', 'blockdiag', and 'nwdiag' directives
+# that docutils doesn't have. We don't need the content, so just mock
+# the directives. Parsing succeeds, while ignoring the directive.
 
 class MockLiteralInclude(Directive):
     required_arguments = 1
@@ -96,3 +99,17 @@ class MockLiteralInclude(Directive):
         include_file = docutils.parsers.rst.directives.uri(self.arguments[0])
         include_node = nodes.literal_block(rawsource=include_file)
         return [include_node]
+
+
+class MockBlockDiag(Directive):
+    required_arguments = 0
+    optional_arguments = 0
+    final_argument_whitespace = True
+    option_spec = {}
+    has_content = True
+
+    def run(self):
+        self.assert_has_content()
+        text = '\n'.join(self.content)
+        block_node = nodes.literal_block(rawsource=text)
+        return [block_node]
