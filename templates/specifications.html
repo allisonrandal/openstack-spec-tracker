@@ -1,0 +1,111 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      lang="en">
+ <head>
+  <meta content="text/html; charset=utf8" http-equiv="Content-Type"/>
+  <title>
+   Specifications for {{ specset.cycle|capitalize }}
+  </title>
+  <script type="text/javascript"
+          src="http://status.openstack.org/common.js"></script>
+
+
+  <!-- Google Fonts -->
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=PT+Sans&amp;subset=latin"/>
+
+  <!-- Framework CSS -->
+  <link rel="stylesheet" type="text/css" href="http://www.openstack.org/themes/openstack/css/blueprint/screen.css" media="screen, projection"/>
+  <link rel="stylesheet" type="text/css" href="http://www.openstack.org/themes/openstack/css/blueprint/print.css" media="print"/>
+  <link rel="stylesheet" type="text/css" href="http://www.openstack.org/themes/openstack/css/main.css"/>
+
+  <!-- Page Specific CSS -->
+  <link rel="stylesheet" type="text/css" href="http://status.openstack.org/reviews/combo.css" media="screen,print"/>
+
+  <script type="text/javascript"
+          src="http://status.openstack.org/reviews/sorting.js"></script>
+
+ </head>
+ <body id="document">
+  <script type="text/javascript">
+   header('Release');
+  </script>
+  <div class="container">
+   <div class="span-20">
+    <h1>
+     Specifications for {{ specset.cycle|capitalize }}
+    </h1>
+    <ul class="breadcrumbs">
+     <li>
+      Page refreshed at {{ date }} UTC
+     </li>
+    </ul>
+   </div>
+  </div>
+  <div class="container">
+   <table class="listing sortable" summary="key topic frequency">
+    <thead>
+     <tr>
+      <th>
+       <a class="sortheader" href="#" id="sort-priority" onclick="ts_resortTable(this); return false;" title="Priority">
+        Priority
+        <img class="sortarrow" height="6" src="arrowBlank" width="9"/>
+       </a>
+      </th>
+      <th>
+       <a class="sortheader" href="#" id="sort-project" onclick="ts_resortTable(this); return false;" title="Project">
+        Project
+        <img class="sortarrow" height="6" src="arrowBlank" width="9"/>
+       </a>
+      </th>
+      <th>
+       <a class="sortheader" href="#" id="sort-spec-title" onclick="ts_resortTable(this); return false;" title="Spec">
+        Spec
+        <img class="sortarrow" height="6" src="arrowBlank" width="9"/>
+       </a>
+      </th>
+      <th>
+       <a class="sortheader" href="#" id="sort-assignee" onclick="ts_resortTable(this); return false;" title="Assignee">
+        Assignee
+        <img class="sortarrow" height="6" src="arrowBlank" width="9"/>
+       </a>
+      </th>
+     </tr>
+    </thead>
+    <tbody>
+{% macro render_specs(spec) -%}
+     <tr>
+      <td>
+       <span class="sortkey">
+        {{ spec.blueprint.priorityindex }}
+       </span>
+       {{ spec.blueprint.priority }}
+      </td>
+      <td>
+       {{ spec.project }}
+      </td>
+      <td>
+       <span class="sortkey">
+         {{ spec.title }}
+       </span>
+       <a href="{{ spec.url }}">
+         {{ spec.title }}
+       </a>
+      </td>
+      <td>
+       {{ spec.blueprint.assignee }}
+      </td>
+     </tr>
+{%- endmacro %}
+     {% for spec in specset.specs %}{{ render_specs(spec) }}{% endfor %}
+    </tbody>
+   </table>
+   <script type="text/javascript">
+    ts_resortTable(document.getElementById("sort-priority"))
+    ts_resortTable(document.getElementById("sort-spec-title"))
+   </script>
+  </div>
+  <script type="text/javascript">
+   footer();
+  </script>
+ </body>
+</html>

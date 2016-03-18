@@ -13,8 +13,8 @@
 import argparse
 import yaml
 
-from spectracker.specification import SpecificationSet
 from spectracker.pagerender import render_keytopics
+from spectracker.specification import SpecificationSet
 
 
 if __name__ == '__main__':
@@ -45,11 +45,10 @@ if __name__ == '__main__':
         config = yaml.load(config_fh)
 
     specs = SpecificationSet(config['projects'],
-                                config['cycle'],
-                                args.repocache)
+                             config['cycle'],
+                             args.repocache)
     specs.load_specs()
     specs.parse_specs()
 
     topics = specs.aggregate_topic_frequency(config['skiptopics'])
-
-    render_keytopics(args.templates, topics, config['cycle'])
+    render_keytopics(args.templates, args.output, topics, config['cycle'])

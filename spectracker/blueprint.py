@@ -13,6 +13,7 @@
 #    under the License.
 
 from launchpadlib.launchpad import Launchpad
+from lazr.restfulclient.errors import NotFound
 
 
 class Blueprint(object):
@@ -46,14 +47,12 @@ class Blueprint(object):
         if lbp.assignee:
             self.assignee = lbp.assignee.name
             self.contributors.append(lbp.assignee.name)
-            print(self.assignee)
         else:
             self.assignee = ''
 
         if lbp.drafter:
             self.drafter = lbp.drafter.name
             self.contributors.append(lbp.drafter.name)
-            print(self.drafter)
         else:
             self.drafter = ''
 
@@ -66,15 +65,13 @@ class BlueprintSet(object):
             repocache + '/launchpadlib-cache',
             version='devel')
 
-    def load_blueprint_url(self, url):
-        bppath = url.split('/')
-        project = bppath[-3]
-        bpname = bppath[-1]
-        return self.load_blueprint(project, bpname)
-
-    def load_blueprint(self, project, bpname):
-        lbp = self.launchpad.projects[project].getSpecification(name=bpname)
-        if not lbp:
+    def load_blueprint(self, url):
+        api_url = url.replace('blueprints.launchpad.net',
+                              'api.launchpad.net/devel')
+        try:
+            lbp = self.launchpad.load(api_url)
+        except NotFound:
             return None
+
         blueprint = Blueprint(lbp)
         return blueprint

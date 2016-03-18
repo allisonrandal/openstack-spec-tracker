@@ -19,11 +19,12 @@ from spectracker.specparser import SpecParser
 
 
 class Specification(object):
-    def __init__(self, name, specfile, project, cycle):
+    def __init__(self, name, specfile, project, cycle, url):
         self.name = name
         self.specfile = specfile
         self.project = project
         self.cycle = cycle
+        self.url = url
         self.blueprint_url = None
         self.blueprint = None
         self.phrases = None
@@ -45,9 +46,7 @@ class Specification(object):
 
     def load_blueprint(self, launchpad):
         if self.blueprint_url:
-            self.blueprint = launchpad.load_blueprint_url(self.blueprint_url)
-        else:
-            self.blueprint = launchpad.load_blueprint(self.project, self.name)
+            self.blueprint = launchpad.load_blueprint(self.blueprint_url)
 
     def affiliation(self, launchpad, contributors):
         if not self.blueprint:
@@ -71,20 +70,36 @@ class SpecificationSet(object):
         self.contributor_index = None
         self.launchpad = None
 
+    def clone(self, specs=None):
+        clone = SpecificationSet(self.projects, self.cycle, self.repocache)
+        clone.contributor_index = self.contributor_index
+        clone.launchpad = self.launchpad
+
+        if specs:
+            clone.specs = specs
+        else:
+            clone.specs = self.specs
+
+        return clone
+
     def load_specs(self):
         for project in self.projects:
             specdir = os.path.join(self.repocache, project + "-specs",
                                    "specs", self.cycle)
+            baseurl = 'http://specs.openstack.org/openstack'
             for root, directory, files in os.walk(specdir):
                 for filename in files:
                     specfile = os.path.join(root, filename)
-                    self.add_spec(filename, specfile, project)
+                    specurl = specfile.replace(self.repocache, baseurl)
+                    specurl = specurl.replace('.rst', '.html')
+                    self.add_spec(filename, specfile, project, specurl)
 
-    def add_spec(self, filename, specfile, project):
+    def add_spec(self, filename, specfile, project, specurl):
         if os.path.isfile(specfile) and not os.path.islink(specfile):
             (specname, extension) = os.path.splitext(filename)
             if extension == '.rst' and specname not in ['index', 'template']:
-                spec = Specification(specname, specfile, project, self.cycle)
+                spec = Specification(specname, specfile,
+                                     project, self.cycle, specurl)
                 self.specs.append(spec)
 
     def parse_specs(self):
@@ -128,4 +143,6 @@ class SpecificationSet(object):
             if company in affiliation:
                 filtered_specs.append(spec)
 
-        return filtered_specs
+        filtered_set = self.clone(specs=filtered_specs)
+
+        return filtered_set

@@ -13,11 +13,29 @@
 from datetime import datetime
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
+import os.path
 
-def render_keytopics(template_dir, topics, cycle):
+
+def render_keytopics(template_dir, output_dir, topics, cycle):
+    template_file = "keytopics.html"
     template_env = Environment(loader=FileSystemLoader(template_dir))
-    keytopics_tmpl = template_env.get_template('keytopics.html')
+    keytopics_tmpl = template_env.get_template(template_file)
 
-    print(keytopics_tmpl.render(series=cycle,
-                                date=str(datetime.utcnow()),
-                                frequency=topics))
+    output_file = os.path.join(output_dir, template_file)
+
+    with open(output_file, 'w') as fh:
+        fh.write(keytopics_tmpl.render(series=cycle,
+                                       date=str(datetime.utcnow()),
+                                       frequency=topics))
+
+
+def render_spec_list(template_dir, output_dir, spec_list):
+    template_file = "specifications.html"
+    template_env = Environment(loader=FileSystemLoader(template_dir))
+    keytopics_tmpl = template_env.get_template(template_file)
+
+    output_file = os.path.join(output_dir, template_file)
+
+    with open(output_file, 'w') as fh:
+        fh.write(keytopics_tmpl.render(date=str(datetime.utcnow()),
+                                       specset=spec_list))
