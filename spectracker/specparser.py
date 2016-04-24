@@ -61,6 +61,7 @@ class SpecParser(object):
                             # The first title in the first section is the
                             # document title
                             self.title = element.astext()
+
                         elif isinstance(element, nodes.paragraph):
                             text = element.astext()
                             match = url_pattern.search(text)
@@ -68,6 +69,14 @@ class SpecParser(object):
                                 self.blueprint = match.group()
                             else:
                                 paragraphs.append(text)
+
+                            for subelement in element:
+                                if isinstance(subelement, nodes.target):
+                                    link = subelement.attributes["refuri"]
+                                    match = url_pattern.search(link)
+                                    if match:
+                                        self.blueprint = match.group()
+
                         elif isinstance(element, nodes.section):
                             for subelement in element:
                                 if isinstance(subelement, nodes.paragraph):
