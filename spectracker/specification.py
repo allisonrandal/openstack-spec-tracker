@@ -28,7 +28,7 @@ class Specification(object):
         self.blueprint_url = None
         self.blueprint = None
         self.phrases = None
-        self.companies = None
+        self.affiliation = None
 
     def extract_text_body(self):
         parser = SpecParser(self.specfile)
@@ -44,21 +44,20 @@ class Specification(object):
             frequency[phrase] = self.phrases.count(phrase)
         return frequency
 
-    def load_blueprint(self, launchpad):
+    def annotate_with_launchpad(self, launchpad):
         if self.blueprint_url:
             self.blueprint = launchpad.load_blueprint(self.blueprint_url)
 
-    def affiliation(self, launchpad, contributors):
+    def annotate_with_affiliation(self, launchpad, contributors):
         if not self.blueprint:
-            self.load_blueprint(launchpad)
+            self.annotate_with_launchpad(launchpad)
 
         if not self.blueprint:
             return []
 
-        self.companies = contributors.affiliation(self.blueprint.contributors,
+        self.affiliation = contributors.affiliation(self.blueprint.contributors,
                                                   self.cycle)
-
-        return self.companies
+        print(self.name, self.affiliation)
 
 
 class SpecificationSet(object):
@@ -128,19 +127,25 @@ class SpecificationSet(object):
 
         return highfrequency
 
-    def filter_by_company(self, company):
+    def annotate_with_launchpad(self):
         if not self.contributor_index:
             self.contributor_index = Contributors(self.repocache)
 
         if not self.launchpad:
             self.launchpad = BlueprintSet(self.repocache)
 
+        for spec in self.specs:
+            spec.annotate_with_launchpad(self.launchpad)
+            spec.annotate_with_affiliation(self.launchpad,
+                                           self.contributor_index)
+
+
+    def filter_by_company(self, company):
+        self.annotate_from_launchpad()
+
         filtered_specs = []
         for spec in self.specs:
-            affiliation = spec.affiliation(self.launchpad,
-                                           self.contributor_index)
-            print(spec.name, affiliation)
-            if company in affiliation:
+            if company in spec.affiliation:
                 filtered_specs.append(spec)
 
         filtered_set = self.clone(specs=filtered_specs)
