@@ -14,6 +14,7 @@ import argparse
 import yaml
 
 from spectracker.pagerender import render_keytopics
+from spectracker.pagerender import render_spec_list
 from spectracker.specification import SpecificationSet
 
 
@@ -52,3 +53,6 @@ if __name__ == '__main__':
 
     topics = specs.aggregate_topic_frequency(config['skiptopics'])
     render_keytopics(args.templates, args.output, topics, config['cycle'])
+
+    specs.annotate_with_launchpad()
+    render_spec_list(args.templates, args.output, specs)
