@@ -65,6 +65,7 @@ class SpecificationSet(object):
         self.projects = projects
         self.cycle = cycle
         self.repocache = os.path.abspath(repocache)
+        self.specbaseurl = 'http://specs.openstack.org/openstack'
         self.specs = []
         self.contributor_index = None
         self.launchpad = None
@@ -83,15 +84,32 @@ class SpecificationSet(object):
 
     def load_specs(self):
         for project in self.projects:
-            specdir = os.path.join(self.repocache, project + "-specs",
-                                   "specs", self.cycle)
-            baseurl = 'http://specs.openstack.org/openstack'
-            for root, directory, files in os.walk(specdir):
-                for filename in files:
-                    specfile = os.path.join(root, filename)
-                    specurl = specfile.replace(self.repocache, baseurl)
-                    specurl = specurl.replace('.rst', '.html')
-                    self.add_spec(filename, specfile, project, specurl)
+            specdirs = self.gather_specdirs(project)
+
+            for specdir in specdirs:
+                for root, directory, files in os.walk(specdir):
+                    for filename in files:
+                        specfile = os.path.join(root, filename)
+                        specurl = specfile.replace(self.repocache,
+                                                   self.specbaseurl)
+                        specurl = specurl.replace('.rst', '.html')
+                        self.add_spec(filename, specfile, project, specurl)
+
+    def gather_specdirs(self, project):
+        specdir = os.path.join(self.repocache, project + "-specs",
+                               "specs", self.cycle)
+
+        if os.path.isdir(specdir):
+            return [specdir]
+
+        specroot = os.path.join(self.repocache, project + "-specs", "specs")
+        specdirs = []
+        for filename in os.listdir(specroot):
+            specdir = os.path.join(specroot, filename, self.cycle)
+            if os.path.isdir(specdir):
+                specdirs.append(specdir)
+
+        return specdirs
 
     def add_spec(self, filename, specfile, project, specurl):
         if os.path.isfile(specfile) and not os.path.islink(specfile):
