@@ -55,8 +55,8 @@ class Specification(object):
         if not self.blueprint:
             return []
 
-        self.affiliation = contributors.affiliation(self.blueprint.contributors,
-                                                  self.cycle)
+        self.affiliation = contributors.affiliation(
+            self.blueprint.contributors, self.cycle)
         print(self.name, self.affiliation)
 
 
@@ -138,7 +138,6 @@ class SpecificationSet(object):
             spec.annotate_with_launchpad(self.launchpad)
             spec.annotate_with_affiliation(self.launchpad,
                                            self.contributor_index)
-
 
     def filter_by_company(self, company):
         self.annotate_from_launchpad()
